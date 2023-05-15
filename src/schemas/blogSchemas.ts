@@ -18,8 +18,8 @@ const updateBlogSchema = z
     return Object.keys(data).length > 0;
   }, "At least one of title, description, content, or tags must be present");
 
-const updateBlogQuerySchema = z.object({
+const blogQuerySchema = z.object({
   id: z.string().uuid(),
 });
 
-export { createBlogSchema, updateBlogSchema, updateBlogQuerySchema };
+export { createBlogSchema, updateBlogSchema, blogQuerySchema };
