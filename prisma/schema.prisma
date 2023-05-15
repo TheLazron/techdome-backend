@@ -1,0 +1,27 @@
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       String      @id @default(uuid())
+  name     String
+  email    String   @unique
+  password String   // Assuming you store the encrypted password
+  blogs    Blog[]
+}
+
+model Blog {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  content     String
+  tags        String[]
+  userId      String     @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  createdOn   DateTime @default(now())
+}
