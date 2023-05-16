@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { Request } from "express";
+import type { Response } from "../types/reponseTypes.js";
 import { Blog, PrismaClient } from "@prisma/client";
 import {
   createBlogSchema,
@@ -8,10 +9,14 @@ import {
 import { z } from "zod";
 import _ from "lodash";
 import errorResponseHandler from "../utils/errorHandler.js";
-import { blogResponse } from "../types/reponseTypes.js";
+import {
+  blogResponse,
+  customBlogResponse,
+  customResponse,
+} from "../types/reponseTypes.js";
 const prisma = new PrismaClient();
 
-const createBlog = async (req: Request, res: Response<blogResponse>) => {
+const createBlog = async (req: Request, res: Response) => {
   try {
     const { title, description, content } = createBlogSchema.parse(req.body);
     const newBlog = await prisma.blog.create({
@@ -29,7 +34,7 @@ const createBlog = async (req: Request, res: Response<blogResponse>) => {
   }
 };
 
-const updateBlog = async (req: Request, res: Response<blogResponse>) => {
+const updateBlog = async (req: Request, res: Response) => {
   try {
     const { title, description, content, tags } = updateBlogSchema.parse(
       req.body
@@ -55,7 +60,7 @@ const updateBlog = async (req: Request, res: Response<blogResponse>) => {
   }
 };
 
-const deleteBlog = async (req: Request, res: Response<blogResponse>) => {
+const deleteBlog = async (req: Request, res: Response) => {
   try {
     const { id } = blogQuerySchema.parse(req.params);
     const deletedBlog = await prisma.blog.delete({
@@ -69,7 +74,7 @@ const deleteBlog = async (req: Request, res: Response<blogResponse>) => {
   }
 };
 
-const getBlog = async (req: Request, res: Response<blogResponse>) => {
+const getBlog = async (req: Request, res: Response) => {
   try {
     const { id } = blogQuerySchema.parse(req.params);
     const returnedBlog = await prisma.blog.findUnique({
@@ -83,7 +88,7 @@ const getBlog = async (req: Request, res: Response<blogResponse>) => {
   }
 };
 
-const getUserBlogs = async (req: Request, res: Response<blogResponse>) => {
+const getUserBlogs = async (req: Request, res: Response) => {
   try {
     const { id } = blogQuerySchema.parse(req.params);
     const fetchedBlogs = await prisma.blog.findMany({
@@ -107,7 +112,28 @@ const getUserBlogs = async (req: Request, res: Response<blogResponse>) => {
   }
 };
 
-const gethomePageBlogs = async (req: Request, res: Response<blogResponse>) => {
+const getMyBlogs = async (req: Request, res: Response) => {
+  try {
+    const userId = res.userId;
+    const pageNumber = parseInt(req.query.pageNumber as string) || 1;
+    const blogsPerPage = parseInt(req.query.blogsPerPage as string) || 4;
+
+    const offset = (pageNumber - 1) * blogsPerPage;
+
+    const userBlogs = await prisma.blog.findMany({
+      where: {
+        userId: userId,
+      },
+      skip: offset,
+      take: blogsPerPage,
+    });
+    res.json({ error: null, data: userBlogs });
+  } catch (error: any) {
+    errorResponseHandler(res, error, "Error while retrieving blogs");
+  }
+};
+
+const gethomePageBlogs = async (req: Request, res: Response) => {
   try {
     const pageNumber = parseInt(req.query.pageNumber as string) || 1;
     const blogsPerPage = parseInt(req.query.blogsPerPage as string) || 4;
@@ -132,4 +158,5 @@ export {
   getBlog,
   getUserBlogs,
   gethomePageBlogs,
+  getMyBlogs,
 };

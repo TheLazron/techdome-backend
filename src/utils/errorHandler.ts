@@ -13,7 +13,7 @@ const errorResponseHandler = (
     return;
   }
 
-  res.json({ error: message });
+  res.json({ error: message, data: null });
   return;
 };
 
