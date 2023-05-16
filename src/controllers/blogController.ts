@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { PrismaClient } from "@prisma/client";
+import { Request, Response } from "express";
+import { Blog, PrismaClient } from "@prisma/client";
 import {
   createBlogSchema,
   updateBlogSchema,
@@ -7,9 +7,11 @@ import {
 } from "../schemas/blogSchemas.js";
 import { z } from "zod";
 import _ from "lodash";
+import errorResponseHandler from "../utils/errorHandler.js";
+import { blogResponse } from "../types/reponseTypes.js";
 const prisma = new PrismaClient();
 
-const createBlog = async (req: Request, res: Response) => {
+const createBlog = async (req: Request, res: Response<blogResponse>) => {
   try {
     const { title, description, content } = createBlogSchema.parse(req.body);
     const newBlog = await prisma.blog.create({
@@ -21,19 +23,13 @@ const createBlog = async (req: Request, res: Response) => {
         userId: "1",
       },
     });
-    res.json({ data: newBlog });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      //   console.log("zodError", error);
-      res.json({ error: error.issues });
-      return;
-    }
-    console.log("error", error);
-    res.json({ error: "Error while creating blog" });
+    return res.json({ error: null, data: newBlog });
+  } catch (error: any) {
+    errorResponseHandler(res, error, "Error while creating blog");
   }
 };
 
-const updateBlog = async (req: Request, res: Response) => {
+const updateBlog = async (req: Request, res: Response<blogResponse>) => {
   try {
     const { title, description, content, tags } = updateBlogSchema.parse(
       req.body
@@ -53,19 +49,13 @@ const updateBlog = async (req: Request, res: Response) => {
         ...updatedData,
       },
     });
-    res.json({ data: updatedBlog });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      //   console.log("zodError", error);
-      res.json({ error: error.issues });
-      return;
-    }
-    console.log("error", error);
-    res.json({ error: "Error while creating blog" });
+    return res.json({ error: null, data: updatedBlog });
+  } catch (error: any) {
+    errorResponseHandler(res, error, "Error while updating blog");
   }
 };
 
-const deleteBlog = async (req: Request, res: Response) => {
+const deleteBlog = async (req: Request, res: Response<blogResponse>) => {
   try {
     const { id } = blogQuerySchema.parse(req.params);
     const deletedBlog = await prisma.blog.delete({
@@ -73,19 +63,13 @@ const deleteBlog = async (req: Request, res: Response) => {
         id,
       },
     });
-    res.json({ message: "deletion successful", data: deletedBlog });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      //   console.log("zodError", error);
-      res.json({ error: error.issues });
-      return;
-    }
-    console.log("error", error);
-    res.json({ error: "Error while creating blog" });
+    return res.json({ error: null, data: deletedBlog });
+  } catch (error: any) {
+    errorResponseHandler(res, error, "Error while deleting blog");
   }
 };
 
-const getBlog = async (req: Request, res: Response) => {
+const getBlog = async (req: Request, res: Response<blogResponse>) => {
   try {
     const { id } = blogQuerySchema.parse(req.params);
     const returnedBlog = await prisma.blog.findUnique({
@@ -93,16 +77,59 @@ const getBlog = async (req: Request, res: Response) => {
         id,
       },
     });
-    res.json({ data: returnedBlog });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      //   console.log("zodError", error);
-      res.json({ error: error.issues });
-      return;
-    }
-    console.log("error", error);
-    res.json({ error: "Error while creating blog" });
+    return res.json({ error: null, data: returnedBlog });
+  } catch (error: any) {
+    errorResponseHandler(res, error, "Error while retrieving blog");
   }
 };
 
-export { createBlog, updateBlog, deleteBlog, getBlog };
+const getUserBlogs = async (req: Request, res: Response<blogResponse>) => {
+  try {
+    const { id } = blogQuerySchema.parse(req.params);
+    const fetchedBlogs = await prisma.blog.findMany({
+      where: {
+        userId: id,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        createdOn: true,
+        tags: true,
+        userId: true,
+        content: false,
+        user: false,
+      },
+    });
+    return res.json({ error: null, data: fetchedBlogs as Blog[] });
+  } catch (error: any) {
+    errorResponseHandler(res, error, "Error while retrieving user's blog");
+  }
+};
+
+const gethomePageBlogs = async (req: Request, res: Response<blogResponse>) => {
+  try {
+    const pageNumber = parseInt(req.query.pageNumber as string) || 1;
+    const blogsPerPage = parseInt(req.query.blogsPerPage as string) || 4;
+
+    const offset = (pageNumber - 1) * blogsPerPage;
+
+    const blogs = await prisma.blog.findMany({
+      skip: offset,
+      take: blogsPerPage,
+    });
+
+    return res.json({ error: null, data: blogs });
+  } catch (error: any) {
+    errorResponseHandler(res, error, "Error while retrieving blogs");
+  }
+};
+
+export {
+  createBlog,
+  updateBlog,
+  deleteBlog,
+  getBlog,
+  getUserBlogs,
+  gethomePageBlogs,
+};

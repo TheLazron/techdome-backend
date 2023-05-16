@@ -21,5 +21,4 @@ const updateBlogSchema = z
 const blogQuerySchema = z.object({
   id: z.string().uuid(),
 });
-
 export { createBlogSchema, updateBlogSchema, blogQuerySchema };
