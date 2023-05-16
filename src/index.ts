@@ -5,6 +5,7 @@ import blogRouter from "./routers/blogRouter.js";
 import authRouter from "./routers/authRouter.js";
 import { parseJwt, verifyJWT } from "./utils/jwtUtils.js";
 import type { customResponse } from "./types/reponseTypes.js";
+import userRouter from "./routers/userRouter.js";
 dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
@@ -27,6 +28,7 @@ const verifyToken = (req: Request, res: customResponse, next: NextFunction) => {
   verifyJWT(token, res, next);
 };
 app.use("/", verifyToken);
+app.use(userRouter);
 app.use(blogRouter);
 
 app.listen(process.env.PORT || 3000, () => {

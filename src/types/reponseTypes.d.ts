@@ -31,11 +31,6 @@ interface updateUserResponse {}
 
 interface getUserResponse {}
 
-interface errorHandlerResponse
-  extends customBlogResponse,
-    Response,
-    loginResponse {}
-
 interface Response extends ExpressResponse {
   email?: string;
   userId?: string;
@@ -46,6 +41,5 @@ export {
   blogResponse,
   customResponse,
   customBlogResponse,
-  errorHandlerResponse,
   Response,
 };
