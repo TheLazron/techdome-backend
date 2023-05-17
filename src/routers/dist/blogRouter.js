@@ -1,0 +1,13 @@
+"use strict";
+exports.__esModule = true;
+var express_1 = require("express");
+var blogController_js_1 = require("../controllers/blogController.js");
+var blogRouter = express_1["default"].Router();
+blogRouter.get("/get-blog/:id", blogController_js_1.getBlog);
+blogRouter.post("/create-blog", blogController_js_1.createBlog);
+blogRouter.post("/update-blog/:id", blogController_js_1.updateBlog);
+blogRouter["delete"]("/delete-blog/:id", blogController_js_1.deleteBlog);
+blogRouter.get("/author-blogs/:id", blogController_js_1.getUserBlogs);
+blogRouter.get("/get-my-blogs", blogController_js_1.getMyBlogs);
+// blogRouter.get("/get-paginated-blogs", gethomePageBlogs);
+exports["default"] = blogRouter;

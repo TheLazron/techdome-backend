@@ -9,6 +9,6 @@ const userRouter: Router = express.Router();
 
 userRouter.post("/update-user/", updateUser);
 userRouter.get("/get-user/:id", getUser);
-userRouter.get("/get-user-list/", getPaginatedUsers);
+// userRouter.get("/get-user-list/", getPaginatedUsers);
 
 export default userRouter;

@@ -17,5 +17,5 @@ blogRouter.post("/update-blog/:id", updateBlog);
 blogRouter.delete("/delete-blog/:id", deleteBlog);
 blogRouter.get("/author-blogs/:id", getUserBlogs);
 blogRouter.get("/get-my-blogs", getMyBlogs);
-blogRouter.get("/get-paginated-blogs", gethomePageBlogs);
+// blogRouter.get("/get-paginated-blogs", gethomePageBlogs);
 export default blogRouter;

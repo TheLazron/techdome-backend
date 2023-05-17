@@ -8,6 +8,7 @@ var blogRouter_js_1 = require("./routers/blogRouter.js");
 var authRouter_js_1 = require("./routers/authRouter.js");
 var jwtUtils_js_1 = require("./utils/jwtUtils.js");
 var userRouter_js_1 = require("./routers/userRouter.js");
+var publicRouter_js_1 = require("./routers/publicRouter.js");
 dotenv_1["default"].config();
 var app = express_1["default"]();
 var prisma = new client_1.PrismaClient();
@@ -27,6 +28,7 @@ var verifyToken = function (req, res, next) {
     jwtUtils_js_1.verifyJWT(token, res, next);
 };
 app.use(authRouter_js_1["default"]);
+app.use(publicRouter_js_1["default"]);
 app.use("/", verifyToken);
 app.use(userRouter_js_1["default"]);
 app.use(blogRouter_js_1["default"]);
