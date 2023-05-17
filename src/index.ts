@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 import blogRouter from "./routers/blogRouter.js";
 import authRouter from "./routers/authRouter.js";
@@ -9,11 +10,13 @@ import userRouter from "./routers/userRouter.js";
 dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
+
+app.use(cors());
+
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-app.use(authRouter);
-
-//VeriyJWT Middleware
+//function to Verify JWT
 const verifyToken = (req: Request, res: customResponse, next: NextFunction) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -27,6 +30,8 @@ const verifyToken = (req: Request, res: customResponse, next: NextFunction) => {
 
   verifyJWT(token, res, next);
 };
+
+app.use(authRouter);
 app.use("/", verifyToken);
 app.use(userRouter);
 app.use(blogRouter);

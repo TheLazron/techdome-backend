@@ -7,6 +7,7 @@ interface loginResponse {
   user: {
     found: boolean;
     token: string | null;
+    userId: string | null;
   };
 }
 

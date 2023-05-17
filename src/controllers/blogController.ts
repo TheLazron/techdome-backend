@@ -18,14 +18,17 @@ const prisma = new PrismaClient();
 
 const createBlog = async (req: Request, res: Response) => {
   try {
-    const { title, description, content } = createBlogSchema.parse(req.body);
+    const userId = res.userId;
+    const { title, description, content, tags } = createBlogSchema.parse(
+      req.body
+    );
     const newBlog = await prisma.blog.create({
       data: {
-        title: "First Blog",
-        description: "This is the first blog",
-        content: "First Blog Content. What to talk about?",
-        tags: ["First blog", "content"],
-        userId: "1",
+        title: title,
+        description: description!,
+        content: content,
+        tags: tags,
+        userId: userId!,
       },
     });
     return res.json({ error: null, data: newBlog });

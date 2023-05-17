@@ -34,7 +34,12 @@ const updateUser = async (req: Request, res: Response) => {
 
 const getUser = async (req: Request, res: Response) => {
   try {
+    console.log("triggered");
+
     const { id } = userQuerySchema.parse(req.params);
+
+    console.log(id);
+
     const userDetails = await prisma.user.findUnique({
       where: {
         id: id,
@@ -43,6 +48,7 @@ const getUser = async (req: Request, res: Response) => {
         id: true,
         email: true,
         name: true,
+        profileUrl: true,
         password: false,
         blogs: {
           select: {
@@ -63,4 +69,32 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 
-export { updateUser, getUser };
+const getPaginatedUsers = async (req: Request, res: Response) => {
+  try {
+    const pageNumber = parseInt(req.query.pageNumber as string) || 1;
+    const blogsPerPage = parseInt(req.query.blogsPerPage as string) || 4;
+    const offset = (pageNumber - 1) * blogsPerPage;
+
+    const users = await prisma.user.findMany({
+      skip: offset,
+      take: blogsPerPage,
+      select: {
+        name: true,
+        profileUrl: true,
+        id: true,
+        email: true,
+        blogs: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    return res.json({ error: null, data: users });
+  } catch (error: any) {
+    errorResponseHandler(res, error, "Error while retrieving blogs");
+  }
+};
+
+export { updateUser, getUser, getPaginatedUsers };

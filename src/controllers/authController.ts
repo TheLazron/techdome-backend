@@ -11,7 +11,11 @@ const prisma = new PrismaClient();
 
 const signUserUp = async (req: Request, res: Response) => {
   try {
-    const { email, password, username } = signUpSchema.parse(req.body);
+    console.log("req", req.body);
+
+    const { email, password, username, profileUrl } = signUpSchema.parse(
+      req.body
+    );
 
     const encryptedPass = await encryptPassowrd(password);
     const createdUser = await prisma.user.create({
@@ -19,9 +23,11 @@ const signUserUp = async (req: Request, res: Response) => {
         email,
         name: username,
         password: encryptedPass,
+        profileUrl,
       },
     });
-    return res.redirect("/login");
+    // return res.redirect("/login");
+    return res.json({ success: true });
   } catch (error: any) {
     errorResponseHandler(res, error, "Trouble Signing User In");
   }
@@ -29,6 +35,7 @@ const signUserUp = async (req: Request, res: Response) => {
 
 const logUserIn = async (req: Request, res: Response<loginResponse>) => {
   try {
+    console.log("req", req.body);
     const { email, password } = loginSchema.parse(req.body);
     const loggedUser = await prisma.user.findFirst({
       where: {
@@ -39,7 +46,7 @@ const logUserIn = async (req: Request, res: Response<loginResponse>) => {
     if (!loggedUser) {
       return res.json({
         error: "User Not Found",
-        user: { found: false, token: null },
+        user: { found: false, token: null, userId: null },
       });
     }
 
@@ -51,12 +58,15 @@ const logUserIn = async (req: Request, res: Response<loginResponse>) => {
     if (!isPasswordMatch) {
       return res.json({
         error: "Invalid password",
-        user: { found: false, token: null },
+        user: { found: false, token: null, userId: null },
       });
     }
 
     const token = generateAccessToken(loggedUser?.email, loggedUser?.id);
-    res.json({ error: null, user: { found: true, token: token } });
+    res.json({
+      error: null,
+      user: { found: true, token: token, userId: loggedUser.id },
+    });
   } catch (error: any) {
     errorResponseHandler(res, error, "Trouble Logging User In");
   }

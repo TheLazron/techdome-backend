@@ -12,6 +12,7 @@ model User {
   name     String
   email    String   @unique
   password String   // Assuming you store the encrypted password
+  profileUrl String
   blogs    Blog[]
 }
 
