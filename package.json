@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon dist/index.js\"",
-    "build": "esbuild index=./src --bundle --minify --outdir=dist --packages=external --platform=node",
+    "build": "esbuild index=./src --bundle --minify --outdir=dist --packages=external --format=esm --platform=node",
     "start": "node dist"
   },
   "keywords": [],
