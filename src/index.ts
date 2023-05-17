@@ -32,8 +32,8 @@ const verifyToken = (req: Request, res: customResponse, next: NextFunction) => {
   verifyJWT(token, res, next);
 };
 
-app.use(authRouter);
 app.use(publicRouter);
+app.use(authRouter);
 app.use("/", verifyToken);
 app.use(userRouter);
 app.use(blogRouter);
