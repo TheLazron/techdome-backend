@@ -87,7 +87,10 @@ var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, fun
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 2, , 3]);
+                console.log("req for", req.params.id);
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 3, , 4]);
                 console.log("triggered");
                 id = userSchema_js_1.userQuerySchema.parse(req.params).id;
                 console.log(id);
@@ -112,16 +115,16 @@ var getUser = function (req, res) { return __awaiter(void 0, void 0, void 0, fun
                             }
                         }
                     })];
-            case 1:
+            case 2:
                 userDetails = _b.sent();
                 blogCount = (_a = userDetails === null || userDetails === void 0 ? void 0 : userDetails.blogs.length) !== null && _a !== void 0 ? _a : 0;
                 return [2 /*return*/, res.json({ error: null, data: __assign(__assign({}, userDetails), { blogCount: blogCount }) })];
-            case 2:
+            case 3:
                 error_2 = _b.sent();
                 console.log(error_2);
                 errorHandler_js_1["default"](res, error_2, "Error while fetching User Data");
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
